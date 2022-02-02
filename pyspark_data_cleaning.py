@@ -18,6 +18,8 @@ from datetime import datetime
 from pyspark.sql.functions import year
 from pyspark.sql.functions import month
 from pyspark.sql.functions import dayofmonth
+from pyspark.sql.functions import regexp_replace
+df.withColumn('address', regexp_replace('address', 'Rd', 'Road'))
 
 
 
@@ -43,6 +45,8 @@ chicago_taxi_df = chicago_taxi_df.withColumn("trip_end_day", dayofmonth(chicago_
 # Adding additional conditions
 chicago_taxi_df=chicago_taxi_df.where(chicago_taxi_df.trip_seconds>10)
 chicago_taxi_df=chicago_taxi_df.where(chicago_taxi_df.trip_miles>0)
+
+chicago_taxi_df = chicago_taxi_df.na.fill("Unspecified",subset=["company"])
 
 #splitting dataframe for testing and training
 train_chicago_taxi_df, test_chicago_taxi_df = chicago_taxi_df.randomSplit(weights=[0.8,0.2])
