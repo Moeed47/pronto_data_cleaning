@@ -19,8 +19,6 @@ from pyspark.sql.functions import year
 from pyspark.sql.functions import month
 from pyspark.sql.functions import dayofmonth
 from pyspark.sql.functions import regexp_replace
-from pyspark.ml.classification import 
-from pyspark.ml.feature.StringIndexer
 
 
 
