@@ -19,15 +19,21 @@ from pyspark.sql.functions import year
 from pyspark.sql.functions import month
 from pyspark.sql.functions import dayofmonth
 from pyspark.sql.functions import regexp_replace
-
+from pyspark.ml.classification import 
+from pyspark.ml.feature.StringIndexer
 
 
 
 spark = SparkSession.builder.appName("pronto-pyspark").getOrCreate()
 chicago_taxi_df = (spark.read.format('bigquery').option('table', "bigquery-public-data.chicago_taxi_trips.taxi_trips").load())
 
+
+chicago_taxi_df = chicago_taxi_df.na.fill("Unspecified",subset=["company"])
+
+
 # Drop Null values from the selected columns
-chicago_taxi_df = chicago_taxi_df.na.drop(subset=["trip_end_timestamp","trip_seconds","trip_miles","fare","tips","pickup_latitude","pickup_longitude","pickup_location","dropoff_latitude","dropoff_longitude","dropoff_location"])
+chicago_taxi_df = chicago_taxi_df.na.drop(how="any")
+#chicago_taxi_df = chicago_taxi_df.na.drop(subset=["trip_end_timestamp","trip_seconds","trip_miles","fare","tips","pickup_latitude","pickup_longitude","pickup_location","dropoff_latitude","dropoff_longitude","dropoff_location"])
 
 #Add date columns from timestamp
 chicago_taxi_df = chicago_taxi_df.withColumn('trip_start_date', chicago_taxi_df['trip_start_timestamp'].cast('date')) \
@@ -46,7 +52,7 @@ chicago_taxi_df = chicago_taxi_df.withColumn("trip_end_day", dayofmonth(chicago_
 chicago_taxi_df=chicago_taxi_df.where(chicago_taxi_df.trip_seconds>10)
 chicago_taxi_df=chicago_taxi_df.where(chicago_taxi_df.trip_miles>0)
 
-chicago_taxi_df = chicago_taxi_df.na.fill("Unspecified",subset=["company"])
+
 
 #splitting dataframe for testing and training
 train_chicago_taxi_df, test_chicago_taxi_df = chicago_taxi_df.randomSplit(weights=[0.8,0.2])
